@@ -1,0 +1,21 @@
+{
+  "name": "Record",
+  "description": "Hear me now.",
+  "slug": "record",
+  "privacy": "public",
+  "sdkVersion": "16.0.0",
+  "version": "1.0.0",
+  "orientation": "portrait",
+  "primaryColor": "#cccccc",
+  "icon": "./icon.png",
+  "loading": {
+    "icon": "./icon.png",
+    "hideExponentText": false
+  },
+  "packagerOpts": {
+    "assetExts": ["ttf", "mp3", "png"]
+  },
+  "ios": {
+    "supportsTablet": true
+  }
+}
