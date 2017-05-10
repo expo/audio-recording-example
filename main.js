@@ -86,6 +86,7 @@ class App extends React.Component {
       soundPosition: null,
       soundDuration: null,
       recordingDuration: null,
+      shouldPlay: false,
       isPlaying: false,
       isRecording: false,
       fontLoaded: false,
@@ -96,7 +97,6 @@ class App extends React.Component {
   }
 
   componentDidMount() {
-    Audio.setIsEnabledAsync(true);
     Audio.setAudioModeAsync({
       allowsRecordingIOS: true,
       interruptionModeIOS: Audio.INTERRUPTION_MODE_IOS_DO_NOT_MIX,
@@ -125,6 +125,7 @@ class App extends React.Component {
       this.setState({
         soundDuration: status.durationMillis,
         soundPosition: status.positionMillis,
+        shouldPlay: status.shouldPlay,
         isPlaying: status.isPlaying,
         rate: status.rate,
         muted: status.isMuted,
@@ -138,6 +139,9 @@ class App extends React.Component {
         soundPosition: null,
         isPlaybackAllowed: false,
       });
+      if (status.error) {
+        console.log(`FATAL PLAYER ERROR: ${status.error}`);
+      }
     }
   };
 
@@ -185,16 +189,17 @@ class App extends React.Component {
       isLoading: true,
     });
     await this.recording.stopAndUnloadAsync();
-    const sound = this.recording.getNewSound();
-    await sound.loadAsync();
-    await sound.setIsLoopingAsync(true);
-    await sound.setIsMutedAsync(this.state.muted);
-    await sound.setVolumeAsync(this.state.volume);
-    await sound.setRateAsync(this.state.rate, this.state.shouldCorrectPitch);
-    sound.setCallback(this._updateScreenForSoundStatus);
-
+    const { sound, status } = await this.recording.createNewLoadedSound(
+      {
+        isLooping: true,
+        isMuted: this.state.muted,
+        volume: this.state.volume,
+        rate: this.state.rate,
+        shouldCorrectPitch: this.state.shouldCorrectPitch,
+      },
+      this._updateScreenForSoundStatus
+    );
     this.sound = sound;
-    await this.sound.getStatusAsync(); // Will call callback to update the screen.
     this.setState({
       isLoading: false,
     });
@@ -257,7 +262,7 @@ class App extends React.Component {
   _onSeekSliderValueChange = value => {
     if (this.sound != null && !this.isSeeking) {
       this.isSeeking = true;
-      this.shouldPlayAtEndOfSeek = this.state.isPlaying;
+      this.shouldPlayAtEndOfSeek = this.state.shouldPlay;
       this.sound.pauseAsync();
     }
   };
@@ -265,9 +270,11 @@ class App extends React.Component {
   _onSeekSliderSlidingComplete = async value => {
     if (this.sound != null) {
       this.isSeeking = false;
-      await this.sound.setPositionAsync(value * this.sound.getDurationMillis());
+      const seekPosition = value * this.state.soundDuration;
       if (this.shouldPlayAtEndOfSeek) {
-        this.sound.playAsync();
+        this.sound.playFromPositionAsync(seekPosition);
+      } else {
+        this.sound.setPositionAsync(seekPosition);
       }
     }
   };
