@@ -189,6 +189,7 @@ class App extends React.Component {
       isLoading: true,
     });
     await this.recording.stopAndUnloadAsync();
+    console.log(`uri: ${this.recording.getURI()}`);
     const { sound, status } = await this.recording.createNewLoadedSound(
       {
         isLooping: true,
