@@ -3,7 +3,7 @@
   "description": "Hear me now.",
   "slug": "record",
   "privacy": "public",
-  "sdkVersion": "18.0.0",
+  "sdkVersion": "UNVERSIONED",
   "version": "1.0.0",
   "orientation": "portrait",
   "primaryColor": "#cccccc",

@@ -97,13 +97,6 @@ class App extends React.Component {
   }
 
   componentDidMount() {
-    Audio.setAudioModeAsync({
-      allowsRecordingIOS: true,
-      interruptionModeIOS: Audio.INTERRUPTION_MODE_IOS_DO_NOT_MIX,
-      playsInSilentModeIOS: true,
-      shouldDuckAndroid: true,
-      interruptionModeAndroid: Audio.INTERRUPTION_MODE_ANDROID_DO_NOT_MIX,
-    });
     (async () => {
       await Font.loadAsync({
         'cutive-mono-regular': require('./assets/fonts/CutiveMono-Regular.ttf'),
@@ -168,13 +161,22 @@ class App extends React.Component {
       this.sound.setCallback(null);
       this.sound = null;
     }
+    await Audio.setAudioModeAsync({
+      allowsRecordingIOS: true,
+      interruptionModeIOS: Audio.INTERRUPTION_MODE_IOS_DO_NOT_MIX,
+      playsInSilentModeIOS: true,
+      shouldDuckAndroid: true,
+      interruptionModeAndroid: Audio.INTERRUPTION_MODE_ANDROID_DO_NOT_MIX,
+    });
     if (this.recording !== null) {
       this.recording.setCallback(null);
       this.recording = null;
     }
 
     const recording = new Audio.Recording();
-    await recording.prepareToRecordAsync();
+    await recording.prepareToRecordAsync(
+      Audio.RECORDING_OPTIONS_PRESET_LOW_QUALITY
+    );
     recording.setCallback(this._updateScreenForRecordingStatus);
 
     this.recording = recording;
@@ -189,7 +191,13 @@ class App extends React.Component {
       isLoading: true,
     });
     await this.recording.stopAndUnloadAsync();
-    console.log(`uri: ${this.recording.getURI()}`);
+    await Audio.setAudioModeAsync({
+      allowsRecordingIOS: false,
+      interruptionModeIOS: Audio.INTERRUPTION_MODE_IOS_DO_NOT_MIX,
+      playsInSilentModeIOS: true,
+      shouldDuckAndroid: true,
+      interruptionModeAndroid: Audio.INTERRUPTION_MODE_ANDROID_DO_NOT_MIX,
+    });
     const { sound, status } = await this.recording.createNewLoadedSound(
       {
         isLooping: true,
