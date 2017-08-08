@@ -12,7 +12,7 @@ import {
   TouchableHighlight,
   View,
 } from 'react-native';
-import Expo, { Asset, Audio, Font, Permissions } from 'expo';
+import Expo, { Asset, Audio, FileSystem, Font, Permissions } from 'expo';
 
 class Icon {
   constructor(module, width, height) {
@@ -94,6 +94,11 @@ class App extends React.Component {
       volume: 1.0,
       rate: 1.0,
     };
+    this.recordingSettings = JSON.parse(
+      JSON.stringify(Audio.RECORDING_OPTIONS_PRESET_LOW_QUALITY)
+    );
+    // // UNCOMMENT THIS TO TEST maxFileSize:
+    // this.recordingSettings.android['maxFileSize'] = 12000;
   }
 
   componentDidMount() {
@@ -149,6 +154,9 @@ class App extends React.Component {
         isRecording: false,
         recordingDuration: status.durationMillis,
       });
+      if (!this.state.isLoading) {
+        this._stopRecordingAndEnablePlayback();
+      }
     }
   };
 
@@ -174,9 +182,7 @@ class App extends React.Component {
     }
 
     const recording = new Audio.Recording();
-    await recording.prepareToRecordAsync(
-      Audio.RECORDING_OPTIONS_PRESET_LOW_QUALITY
-    );
+    await recording.prepareToRecordAsync(this.recordingSettings);
     recording.setCallback(this._updateScreenForRecordingStatus);
 
     this.recording = recording;
@@ -190,7 +196,13 @@ class App extends React.Component {
     this.setState({
       isLoading: true,
     });
-    await this.recording.stopAndUnloadAsync();
+    try {
+      await this.recording.stopAndUnloadAsync();
+    } catch (error) {
+      // Do nothing -- we are already unloaded.
+    }
+    const info = await FileSystem.getInfoAsync(this.recording.getURI());
+    console.log(`FILE INFO: ${JSON.stringify(info)}`);
     await Audio.setAudioModeAsync({
       allowsRecordingIOS: false,
       interruptionModeIOS: Audio.INTERRUPTION_MODE_IOS_DO_NOT_MIX,
