@@ -166,7 +166,7 @@ class App extends React.Component {
     });
     if (this.sound !== null) {
       await this.sound.unloadAsync();
-      this.sound.setCallback(null);
+      this.sound.setOnPlaybackStatusUpdate(null);
       this.sound = null;
     }
     await Audio.setAudioModeAsync({
@@ -177,16 +177,16 @@ class App extends React.Component {
       interruptionModeAndroid: Audio.INTERRUPTION_MODE_ANDROID_DO_NOT_MIX,
     });
     if (this.recording !== null) {
-      this.recording.setCallback(null);
+      this.recording.setOnRecordingStatusUpdate(null);
       this.recording = null;
     }
 
     const recording = new Audio.Recording();
     await recording.prepareToRecordAsync(this.recordingSettings);
-    recording.setCallback(this._updateScreenForRecordingStatus);
+    recording.setOnRecordingStatusUpdate(this._updateScreenForRecordingStatus);
 
     this.recording = recording;
-    await this.recording.startAsync(); // Will call callback to update the screen.
+    await this.recording.startAsync(); // Will call this._updateScreenForRecordingStatus to update the screen.
     this.setState({
       isLoading: false,
     });
