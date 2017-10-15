@@ -2,23 +2,19 @@
   "expo": {
     "name": "Record",
     "description": "Hear me now.",
-    "slug": "record",
+    "slug": "audio-recording-example",
     "privacy": "public",
-    "sdkVersion": "19.0.0",
-    "version": "2.0.0",
+    "sdkVersion": "21.0.0",
+    "version": "1.0.0",
     "orientation": "portrait",
     "primaryColor": "#cccccc",
-    "icon": "./icon.png",
+    "icon": "./assets/icons/icon.png",
     "loading": {
-      "icon": "./icon.png",
-      "hideExponentText": false
+      "hideExponentText": false,
+      "icon": "./assets/icons/icon.png"
     },
     "packagerOpts": {
-      "assetExts": [
-        "ttf",
-        "mp3",
-        "png"
-      ]
+      "assetExts": ["ttf", "mp4", "mp3"]
     },
     "ios": {
       "supportsTablet": true
