@@ -356,7 +356,7 @@ export default class App extends React.Component {
             <Text
               style={[
                 styles.noPermissionsText,
-                { ...Font.style('cutive-mono-regular') },
+                { fontFamily: 'cutive-mono-regular' },
               ]}>
               You must enable audio recording permissions in order to use this
               app.
@@ -389,7 +389,7 @@ export default class App extends React.Component {
                   <Text
                     style={[
                       styles.liveText,
-                      { ...Font.style('cutive-mono-regular') },
+                      { fontFamily: 'cutive-mono-regular' },
                     ]}>
                     {this.state.isRecording ? 'LIVE' : ''}
                   </Text>
@@ -404,7 +404,7 @@ export default class App extends React.Component {
                     <Text
                       style={[
                         styles.recordingTimestamp,
-                        { ...Font.style('cutive-mono-regular') },
+                        { fontFamily: 'cutive-mono-regular' },
                       ]}>
                       {this._getRecordingTimestamp()}
                     </Text>
@@ -419,9 +419,10 @@ export default class App extends React.Component {
               style={[
                 styles.halfScreenContainer,
                 {
-                  opacity: !this.state.isPlaybackAllowed || this.state.isLoading
-                    ? DISABLED_OPACITY
-                    : 1.0,
+                  opacity:
+                    !this.state.isPlaybackAllowed || this.state.isLoading
+                      ? DISABLED_OPACITY
+                      : 1.0,
                 },
               ]}>
               <View />
@@ -440,7 +441,7 @@ export default class App extends React.Component {
                 <Text
                   style={[
                     styles.playbackTimestamp,
-                    { ...Font.style('cutive-mono-regular') },
+                    { fontFamily: 'cutive-mono-regular' },
                   ]}>
                   {this._getPlaybackTimestamp()}
                 </Text>
@@ -518,7 +519,7 @@ export default class App extends React.Component {
                 <Text
                   style={[
                     styles.timestamp,
-                    { ...Font.style('cutive-mono-regular') },
+                    { fontFamily: 'cutive-mono-regular' },
                   ]}>
                   Rate:
                 </Text>
@@ -539,7 +540,7 @@ export default class App extends React.Component {
                   disabled={
                     !this.state.isPlaybackAllowed || this.state.isLoading
                   }>
-                  <Text style={[{ ...Font.style('cutive-mono-regular') }]}>
+                  <Text style={[{ fontFamily: 'cutive-mono-regular' }]}>
                     PC: {this.state.shouldCorrectPitch ? 'yes' : 'no'}
                   </Text>
                 </TouchableHighlight>
