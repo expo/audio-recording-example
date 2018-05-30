@@ -2,7 +2,7 @@
   "expo": {
     "name": "Record",
     "description": "Hear me now.",
-    "slug": "audio-recording-example",
+    "slug": "record",
     "privacy": "public",
     "sdkVersion": "27.0.0",
     "version": "1.0.0",
