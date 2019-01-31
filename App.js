@@ -145,6 +145,7 @@ export default class App extends React.Component {
       playsInSilentModeIOS: true,
       shouldDuckAndroid: true,
       interruptionModeAndroid: Audio.INTERRUPTION_MODE_ANDROID_DO_NOT_MIX,
+      playThroughEarpieceAndroid: true,
     });
     if (this.recording !== null) {
       this.recording.setOnRecordingStatusUpdate(null);
@@ -180,8 +181,9 @@ export default class App extends React.Component {
       playsInSilentLockedModeIOS: true,
       shouldDuckAndroid: true,
       interruptionModeAndroid: Audio.INTERRUPTION_MODE_ANDROID_DO_NOT_MIX,
+      playThroughEarpieceAndroid: true,
     });
-    const { sound, status } = await this.recording.createNewLoadedSound(
+    const { sound, status } = await this.recording.createNewLoadedSoundAsync(
       {
         isLooping: true,
         isMuted: this.state.muted,
@@ -585,4 +587,4 @@ const styles = StyleSheet.create({
   },
 });
 
-Expo.registerRootComponent(App);
+// Expo.registerRootComponent(App);
