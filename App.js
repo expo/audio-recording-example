@@ -1,7 +1,3 @@
-/**
- * @flow
- */
-
 import React from 'react';
 import {
   Dimensions,
@@ -12,7 +8,7 @@ import {
   TouchableHighlight,
   View,
 } from 'react-native';
-import Expo, { Asset, Audio, FileSystem, Font, Permissions } from 'expo';
+import { Asset, Audio, FileSystem, Font, Linking, Permissions } from 'expo';
 
 class Icon {
   constructor(module, width, height) {
@@ -38,8 +34,8 @@ const ICON_THUMB_1 = new Icon(require('./assets/images/thumb_1.png'), 18, 19);
 const ICON_THUMB_2 = new Icon(require('./assets/images/thumb_2.png'), 15, 19);
 
 const { width: DEVICE_WIDTH, height: DEVICE_HEIGHT } = Dimensions.get('window');
-const BACKGROUND_COLOR = '#FFF8ED';
-const LIVE_COLOR = '#FF0000';
+const BACKGROUND_COLOR = '#ccc';
+const LIVE_COLOR = '#f00';
 const DISABLED_OPACITY = 0.5;
 const RATE_SCALE = 3.0;
 
@@ -67,7 +63,8 @@ export default class App extends React.Component {
       rate: 1.0,
     };
     this.recordingSettings = JSON.parse(JSON.stringify(Audio.RECORDING_OPTIONS_PRESET_LOW_QUALITY));
-    // // UNCOMMENT THIS TO TEST maxFileSize:
+
+    // UNCOMMENT THIS TO TEST maxFileSize:
     // this.recordingSettings.android['maxFileSize'] = 12000;
   }
 
@@ -78,6 +75,7 @@ export default class App extends React.Component {
       });
       this.setState({ fontLoaded: true });
     })();
+
     this._askForPermissions();
   }
 
@@ -318,17 +316,34 @@ export default class App extends React.Component {
   }
 
   render() {
-    return !this.state.fontLoaded ? (
-      <View style={styles.emptyContainer} />
-    ) : !this.state.haveRecordingPermissions ? (
-      <View style={styles.container}>
-        <View />
-        <Text style={[styles.noPermissionsText, { fontFamily: 'cutive-mono-regular' }]}>
-          You must enable audio recording permissions in order to use this app.
-        </Text>
-        <View />
-      </View>
-    ) : (
+
+    // font not loaded yet
+    if (!this.state.fontLoaded) {
+      return <View style={styles.emptyContainer} />;
+    }
+
+    // permissions not granted for audio recording
+    if (!this.state.haveRecordingPermissions) {
+      return (
+        <View style={styles.container}>
+          <View />
+          <Text style={[styles.noPermissionsText, { fontFamily: 'cutive-mono-regular' }]}>
+            You must enable audio recording permissions in order to use this app.
+          </Text>
+          <TouchableHighlight
+            onPress={() => Linking.openURL('app-settings:')}
+            style={styles.wrapper}
+            underlayColor={BACKGROUND_COLOR}>
+            <Text style={[styles.noPermissionsText, { fontFamily: 'cutive-mono-regular' }]}>
+              Go To Settings
+            </Text>
+          </TouchableHighlight>
+          <View />
+        </View>
+      );
+    }
+
+    return (
       <View style={styles.container}>
         <View
           style={[
@@ -465,124 +480,123 @@ const styles = StyleSheet.create({
     backgroundColor: BACKGROUND_COLOR,
   },
   container: {
-    flex: 1,
-    flexDirection: 'column',
-    justifyContent: 'space-between',
     alignItems: 'center',
     alignSelf: 'stretch',
     backgroundColor: BACKGROUND_COLOR,
-    minHeight: DEVICE_HEIGHT,
+    flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'space-between',
     maxHeight: DEVICE_HEIGHT,
+    minHeight: DEVICE_HEIGHT,
+    padding: 16
   },
   noPermissionsText: {
     textAlign: 'center',
   },
   wrapper: {},
   halfScreenContainer: {
+    alignItems: 'center',
+    alignSelf: 'stretch',
     flex: 1,
     flexDirection: 'column',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    alignSelf: 'stretch',
-    minHeight: DEVICE_HEIGHT / 2.0,
     maxHeight: DEVICE_HEIGHT / 2.0,
+    minHeight: DEVICE_HEIGHT / 2.0
   },
   recordingContainer: {
+    alignItems: 'center',
+    alignSelf: 'stretch',
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    alignSelf: 'stretch',
-    minHeight: ICON_RECORD_BUTTON.height,
     maxHeight: ICON_RECORD_BUTTON.height,
+    minHeight: ICON_RECORD_BUTTON.height
   },
   recordingDataContainer: {
+    alignItems: 'center',
     flex: 1,
     flexDirection: 'column',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    minHeight: ICON_RECORD_BUTTON.height,
     maxHeight: ICON_RECORD_BUTTON.height,
-    minWidth: ICON_RECORD_BUTTON.width * 3.0,
     maxWidth: ICON_RECORD_BUTTON.width * 3.0,
+    minHeight: ICON_RECORD_BUTTON.height,
+    minWidth: ICON_RECORD_BUTTON.width * 3.0
   },
   recordingDataRowContainer: {
+    alignItems: 'center',
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    minHeight: ICON_RECORDING.height,
     maxHeight: ICON_RECORDING.height,
+    minHeight: ICON_RECORDING.height
   },
   playbackContainer: {
+    alignItems: 'center',
+    alignSelf: 'stretch',
     flex: 1,
     flexDirection: 'column',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    alignSelf: 'stretch',
-    minHeight: ICON_THUMB_1.height * 2.0,
     maxHeight: ICON_THUMB_1.height * 2.0,
+    minHeight: ICON_THUMB_1.height * 2.0
   },
   playbackSlider: {
-    alignSelf: 'stretch',
+    alignSelf: 'stretch'
   },
   liveText: {
-    color: LIVE_COLOR,
+    color: LIVE_COLOR
   },
   recordingTimestamp: {
-    paddingLeft: 20,
+    paddingLeft: 20
   },
   playbackTimestamp: {
-    textAlign: 'right',
     alignSelf: 'stretch',
     paddingRight: 20,
+    textAlign: 'right'
   },
   image: {
-    backgroundColor: BACKGROUND_COLOR,
+    backgroundColor: BACKGROUND_COLOR
   },
   textButton: {
     backgroundColor: BACKGROUND_COLOR,
-    padding: 10,
+    padding: 10
   },
   buttonsContainerBase: {
+    alignItems: 'center',
     flex: 1,
     flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'space-between'
   },
   buttonsContainerTopRow: {
-    maxHeight: ICON_MUTED_BUTTON.height,
     alignSelf: 'stretch',
-    paddingRight: 20,
+    maxHeight: ICON_MUTED_BUTTON.height,
+    paddingRight: 20
   },
   playStopContainer: {
+    alignItems: 'center',
     flex: 1,
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
-    minWidth: (ICON_PLAY_BUTTON.width + ICON_STOP_BUTTON.width) * 3.0 / 2.0,
     maxWidth: (ICON_PLAY_BUTTON.width + ICON_STOP_BUTTON.width) * 3.0 / 2.0,
+    minWidth: (ICON_PLAY_BUTTON.width + ICON_STOP_BUTTON.width) * 3.0 / 2.0
   },
   volumeContainer: {
+    alignItems: 'center',
     flex: 1,
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
-    minWidth: DEVICE_WIDTH / 2.0,
     maxWidth: DEVICE_WIDTH / 2.0,
+    minWidth: DEVICE_WIDTH / 2.0
   },
   volumeSlider: {
-    width: DEVICE_WIDTH / 2.0 - ICON_MUTED_BUTTON.width,
+    width: DEVICE_WIDTH / 2.0 - ICON_MUTED_BUTTON.width
   },
   buttonsContainerBottomRow: {
-    maxHeight: ICON_THUMB_1.height,
     alignSelf: 'stretch',
+    maxHeight: ICON_THUMB_1.height,
     paddingRight: 20,
-    paddingLeft: 20,
+    paddingLeft: 20
   },
   rateSlider: {
-    width: DEVICE_WIDTH / 2.0,
+    width: DEVICE_WIDTH / 2.0
   },
 });
-
-Expo.registerRootComponent(App);

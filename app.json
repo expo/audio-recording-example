@@ -1,20 +1,24 @@
 {
   "expo": {
-    "name": "Record",
-    "description": "Hear me now.",
-    "slug": "record",
+    "name": "expo-audio-recording",
+    "description": "example of audio recording within expo",
+    "scheme": "expo-audio-recording",
+    "slug": "expo-audio-recording",
     "privacy": "public",
-    "sdkVersion": "27.0.0",
+    "sdkVersion": "32.0.0",
     "version": "1.0.0",
+    "platforms": ["ios", "android"],
+    "githubUrl": "https://github.com/expo/audio-recording-example",
     "orientation": "portrait",
     "primaryColor": "#cccccc",
-    "icon": "./assets/icons/icon.png",
-    "loading": {
-      "hideExponentText": false,
-      "icon": "./assets/icons/icon.png"
+    "icon": "./assets/icon.png",
+    "splash": {
+      "backgroundColor": "#cccccc",
+      "image": "./assets/splash.png",
+      "resizeMode": "contain"
     },
     "packagerOpts": {
-      "assetExts": ["ttf", "mp4", "mp3"]
+      "assetExts": ["mp3", "mp4", "ttf"]
     },
     "ios": {
       "supportsTablet": true

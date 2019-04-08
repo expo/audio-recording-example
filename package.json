@@ -1,13 +1,22 @@
 {
-  "name": "Record",
-  "version": "0.0.0",
-  "description": "Hear me now.",
-  "author": null,
+  "name": "expo-audio-recording",
+  "version": "0.0.1",
+  "description": "example of audio recording within expo",
+  "author": "expo",
+  "keywords": [
+    "expo",
+    "react-native",
+    "audio",
+    "recording"
+  ],
   "private": true,
   "main": "node_modules/expo/AppEntry.js",
   "dependencies": {
-    "expo": "^27.0.0",
-    "react": "16.3.1",
-    "react-native": "https://github.com/expo/react-native/archive/sdk-27.0.0.tar.gz"
+    "expo": "^32.0.0",
+    "react": "16.5.0",
+    "react-native": "https://github.com/expo/react-native/archive/sdk-32.0.0.tar.gz"
+  },
+  "devDependencies": {
+    "babel-preset-expo": "^5.0.0"
   }
 }
