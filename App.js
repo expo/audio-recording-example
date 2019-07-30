@@ -12,7 +12,11 @@ import {
   TouchableHighlight,
   View,
 } from 'react-native';
-import Expo, { Asset, Audio, FileSystem, Font, Permissions } from 'expo';
+import { Asset } from 'expo-asset';
+import { Audio } from 'expo-av';
+import * as FileSystem from 'expo-file-system';
+import * as Font from 'expo-font';
+import * as Permissions from 'expo-permissions';
 
 class Icon {
   constructor(module, width, height) {
@@ -145,6 +149,8 @@ export default class App extends React.Component {
       playsInSilentModeIOS: true,
       shouldDuckAndroid: true,
       interruptionModeAndroid: Audio.INTERRUPTION_MODE_ANDROID_DO_NOT_MIX,
+      playThroughEarpieceAndroid: false,
+      staysActiveInBackground: true,
     });
     if (this.recording !== null) {
       this.recording.setOnRecordingStatusUpdate(null);
@@ -180,8 +186,10 @@ export default class App extends React.Component {
       playsInSilentLockedModeIOS: true,
       shouldDuckAndroid: true,
       interruptionModeAndroid: Audio.INTERRUPTION_MODE_ANDROID_DO_NOT_MIX,
+      playThroughEarpieceAndroid: false,
+      staysActiveInBackground: true,
     });
-    const { sound, status } = await this.recording.createNewLoadedSound(
+    const { sound, status } = await this.recording.createNewLoadedSoundAsync(
       {
         isLooping: true,
         isMuted: this.state.muted,
@@ -584,5 +592,3 @@ const styles = StyleSheet.create({
     width: DEVICE_WIDTH / 2.0,
   },
 });
-
-Expo.registerRootComponent(App);

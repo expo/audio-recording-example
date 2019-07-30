@@ -5,9 +5,19 @@
   "author": null,
   "private": true,
   "main": "node_modules/expo/AppEntry.js",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "eject": "expo eject"
+  },
   "dependencies": {
-    "expo": "^27.0.0",
-    "react": "16.3.1",
-    "react-native": "https://github.com/expo/react-native/archive/sdk-27.0.0.tar.gz"
+    "expo": "^34.0.1",
+    "expo-asset": "^6.0.0",
+    "expo-av": "~6.0.0",
+    "expo-file-system": "~6.0.0",
+    "expo-permissions": "~6.0.0",
+    "react": "16.8.3",
+    "react-native": "https://github.com/expo/react-native/archive/sdk-34.0.0.tar.gz"
   }
 }
