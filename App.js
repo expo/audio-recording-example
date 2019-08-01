@@ -326,17 +326,25 @@ export default class App extends React.Component {
   }
 
   render() {
-    return !this.state.fontLoaded ? (
-      <View style={styles.emptyContainer} />
-    ) : !this.state.haveRecordingPermissions ? (
-      <View style={styles.container}>
-        <View />
-        <Text style={[styles.noPermissionsText, { fontFamily: 'cutive-mono-regular' }]}>
-          You must enable audio recording permissions in order to use this app.
-        </Text>
-        <View />
-      </View>
-    ) : (
+    if(!this.state.fontLoaded) {
+        return (
+            <View style={styles.emptyContainer} />
+        )
+    }
+
+    if (!this.state.haveRecordingPermissions){
+        return (
+            <View style={styles.container}>
+                <View />
+                <Text style={[styles.noPermissionsText, { fontFamily: 'cutive-mono-regular' }]}>
+                  You must enable audio recording permissions in order to use this app.
+                </Text>
+                <View />
+            </View>
+        )
+    }
+
+    return (
       <View style={styles.container}>
         <View
           style={[
