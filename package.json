@@ -12,12 +12,12 @@
     "eject": "expo eject"
   },
   "dependencies": {
-    "expo": "^34.0.1",
-    "expo-asset": "^6.0.0",
-    "expo-av": "~6.0.0",
-    "expo-file-system": "~6.0.0",
-    "expo-permissions": "~6.0.0",
-    "react": "16.8.3",
-    "react-native": "https://github.com/expo/react-native/archive/sdk-34.0.0.tar.gz"
+    "expo": "^38.0.0",
+    "expo-asset": "~8.1.7",
+    "expo-av": "~8.2.1",
+    "expo-file-system": "~9.0.1",
+    "expo-permissions": "~9.0.1",
+    "react": "16.11.0",
+    "react-native": "https://github.com/expo/react-native/archive/sdk-38.0.2.tar.gz"
   }
 }

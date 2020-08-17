@@ -4,7 +4,6 @@
     "description": "Hear me now.",
     "slug": "record",
     "privacy": "public",
-    "sdkVersion": "34.0.0",
     "version": "1.0.0",
     "orientation": "portrait",
     "primaryColor": "#cccccc",
@@ -14,7 +13,11 @@
       "icon": "./assets/icons/icon.png"
     },
     "packagerOpts": {
-      "assetExts": ["ttf", "mp4", "mp3"]
+      "assetExts": [
+        "ttf",
+        "mp4",
+        "mp3"
+      ]
     },
     "ios": {
       "supportsTablet": true
