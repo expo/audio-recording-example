@@ -68,11 +68,16 @@ export default class App extends React.Component<Props, State> {
       volume: 1.0,
       rate: 1.0,
     };
-    this.recordingSettings = JSON.parse(
-      JSON.stringify(Audio.RECORDING_OPTIONS_PRESET_LOW_QUALITY)
-    );
-    // // UNCOMMENT THIS TO TEST maxFileSize:
-    // this.recordingSettings.android['maxFileSize'] = 12000;
+    this.recordingSettings = Audio.RECORDING_OPTIONS_PRESET_LOW_QUALITY;
+
+    // UNCOMMENT THIS TO TEST maxFileSize:
+    /* this.recordingSettings = {
+      ...this.recordingSettings,
+      android: {
+        ...this.recordingSettings.android,
+        maxFileSize: 12000
+      }
+    }*/
   }
 
   componentDidMount() {
