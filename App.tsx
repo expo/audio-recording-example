@@ -75,9 +75,9 @@ export default class App extends React.Component<Props, State> {
       ...this.recordingSettings,
       android: {
         ...this.recordingSettings.android,
-        maxFileSize: 12000
-      }
-    }*/
+        maxFileSize: 12000,
+      },
+    };*/
   }
 
   componentDidMount() {
