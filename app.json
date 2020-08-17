@@ -12,13 +12,6 @@
       "hideExponentText": false,
       "icon": "./assets/icons/icon.png"
     },
-    "packagerOpts": {
-      "assetExts": [
-        "ttf",
-        "mp4",
-        "mp3"
-      ]
-    },
     "ios": {
       "supportsTablet": true
     }
