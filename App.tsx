@@ -8,62 +8,11 @@ import {
   TouchableHighlight,
   View,
 } from "react-native";
-import { Asset } from "expo-asset";
-import { Audio } from "expo-av";
+import { Audio, AVPlaybackStatus } from "expo-av";
 import * as FileSystem from "expo-file-system";
 import * as Font from "expo-font";
 import * as Permissions from "expo-permissions";
-
-class Icon {
-  constructor(module, width, height) {
-    this.module = module;
-    this.width = width;
-    this.height = height;
-    Asset.fromModule(this.module).downloadAsync();
-  }
-}
-
-const ICON_RECORD_BUTTON = new Icon(
-  require("./assets/images/record_button.png"),
-  70,
-  119
-);
-const ICON_RECORDING = new Icon(
-  require("./assets/images/record_icon.png"),
-  20,
-  14
-);
-
-const ICON_PLAY_BUTTON = new Icon(
-  require("./assets/images/play_button.png"),
-  34,
-  51
-);
-const ICON_PAUSE_BUTTON = new Icon(
-  require("./assets/images/pause_button.png"),
-  34,
-  51
-);
-const ICON_STOP_BUTTON = new Icon(
-  require("./assets/images/stop_button.png"),
-  22,
-  22
-);
-
-const ICON_MUTED_BUTTON = new Icon(
-  require("./assets/images/muted_button.png"),
-  67,
-  58
-);
-const ICON_UNMUTED_BUTTON = new Icon(
-  require("./assets/images/unmuted_button.png"),
-  67,
-  58
-);
-
-const ICON_TRACK_1 = new Icon(require("./assets/images/track_1.png"), 166, 5);
-const ICON_THUMB_1 = new Icon(require("./assets/images/thumb_1.png"), 18, 19);
-const ICON_THUMB_2 = new Icon(require("./assets/images/thumb_2.png"), 15, 19);
+import * as Icons from "./components/Icons";
 
 const { width: DEVICE_WIDTH, height: DEVICE_HEIGHT } = Dimensions.get("window");
 const BACKGROUND_COLOR = "#FFF8ED";
@@ -71,8 +20,33 @@ const LIVE_COLOR = "#FF0000";
 const DISABLED_OPACITY = 0.5;
 const RATE_SCALE = 3.0;
 
-export default class App extends React.Component {
-  constructor(props) {
+type Props = {};
+
+type State = {
+  haveRecordingPermissions: boolean;
+  isLoading: boolean;
+  isPlaybackAllowed: boolean;
+  muted: boolean;
+  soundPosition: number | null;
+  soundDuration: number | null;
+  recordingDuration: number | null;
+  shouldPlay: boolean;
+  isPlaying: boolean;
+  isRecording: boolean;
+  fontLoaded: boolean;
+  shouldCorrectPitch: boolean;
+  volume: number;
+  rate: number;
+};
+
+export default class App extends React.Component<Props, State> {
+  private recording: Audio.Recording | null;
+  private sound: Audio.Sound | null;
+  private isSeeking: boolean;
+  private shouldPlayAtEndOfSeek: boolean;
+  private readonly recordingSettings: Audio.RecordingOptions;
+
+  constructor(props: Props) {
     super(props);
     this.recording = null;
     this.sound = null;
@@ -118,10 +92,10 @@ export default class App extends React.Component {
     });
   };
 
-  private _updateScreenForSoundStatus = (status) => {
+  private _updateScreenForSoundStatus = (status: AVPlaybackStatus) => {
     if (status.isLoaded) {
       this.setState({
-        soundDuration: status.durationMillis,
+        soundDuration: status.durationMillis ?? null,
         soundPosition: status.positionMillis,
         shouldPlay: status.shouldPlay,
         isPlaying: status.isPlaying,
@@ -143,7 +117,7 @@ export default class App extends React.Component {
     }
   };
 
-  private _updateScreenForRecordingStatus = (status) => {
+  private _updateScreenForRecordingStatus = (status: Audio.RecordingStatus) => {
     if (status.canRecord) {
       this.setState({
         isRecording: status.isRecording,
@@ -198,18 +172,20 @@ export default class App extends React.Component {
     this.setState({
       isLoading: true,
     });
+    if (!this.recording) {
+      return;
+    }
     try {
       await this.recording.stopAndUnloadAsync();
     } catch (error) {
       // Do nothing -- we are already unloaded.
     }
-    const info = await FileSystem.getInfoAsync(this.recording.getURI());
+    const info = await FileSystem.getInfoAsync(this.recording.getURI() || "");
     console.log(`FILE INFO: ${JSON.stringify(info)}`);
     await Audio.setAudioModeAsync({
       allowsRecordingIOS: false,
       interruptionModeIOS: Audio.INTERRUPTION_MODE_IOS_DO_NOT_MIX,
       playsInSilentModeIOS: true,
-      playsInSilentLockedModeIOS: true,
       shouldDuckAndroid: true,
       interruptionModeAndroid: Audio.INTERRUPTION_MODE_ANDROID_DO_NOT_MIX,
       playThroughEarpieceAndroid: false,
@@ -261,13 +237,13 @@ export default class App extends React.Component {
     }
   };
 
-  private _onVolumeSliderValueChange = (value) => {
+  private _onVolumeSliderValueChange = (value: number) => {
     if (this.sound != null) {
       this.sound.setVolumeAsync(value);
     }
   };
 
-  private _trySetRate = async (rate, shouldCorrectPitch) => {
+  private _trySetRate = async (rate: number, shouldCorrectPitch: boolean) => {
     if (this.sound != null) {
       try {
         await this.sound.setRateAsync(rate, shouldCorrectPitch);
@@ -277,15 +253,15 @@ export default class App extends React.Component {
     }
   };
 
-  private _onRateSliderSlidingComplete = async (value) => {
+  private _onRateSliderSlidingComplete = async (value: number) => {
     this._trySetRate(value * RATE_SCALE, this.state.shouldCorrectPitch);
   };
 
-  private _onPitchCorrectionPressed = async (value) => {
+  private _onPitchCorrectionPressed = () => {
     this._trySetRate(this.state.rate, !this.state.shouldCorrectPitch);
   };
 
-  private _onSeekSliderValueChange = (value) => {
+  private _onSeekSliderValueChange = (value: number) => {
     if (this.sound != null && !this.isSeeking) {
       this.isSeeking = true;
       this.shouldPlayAtEndOfSeek = this.state.shouldPlay;
@@ -293,10 +269,10 @@ export default class App extends React.Component {
     }
   };
 
-  private _onSeekSliderSlidingComplete = async (value) => {
+  private _onSeekSliderSlidingComplete = async (value: number) => {
     if (this.sound != null) {
       this.isSeeking = false;
-      const seekPosition = value * this.state.soundDuration;
+      const seekPosition = value * (this.state.soundDuration || 0);
       if (this.shouldPlayAtEndOfSeek) {
         this.sound.playFromPositionAsync(seekPosition);
       } else {
@@ -316,12 +292,12 @@ export default class App extends React.Component {
     return 0;
   }
 
-  private _getMMSSFromMillis(millis) {
+  private _getMMSSFromMillis(millis: number) {
     const totalSeconds = millis / 1000;
     const seconds = Math.floor(totalSeconds % 60);
     const minutes = Math.floor(totalSeconds / 60);
 
-    const padWithZero = (number) => {
+    const padWithZero = (number: number) => {
       const string = number.toString();
       if (number < 10) {
         return "0" + string;
@@ -393,7 +369,7 @@ export default class App extends React.Component {
               onPress={this._onRecordPressed}
               disabled={this.state.isLoading}
             >
-              <Image style={styles.image} source={ICON_RECORD_BUTTON.module} />
+              <Image style={styles.image} source={Icons.RECORD_BUTTON.module} />
             </TouchableHighlight>
             <View style={styles.recordingDataContainer}>
               <View />
@@ -408,7 +384,7 @@ export default class App extends React.Component {
                     styles.image,
                     { opacity: this.state.isRecording ? 1.0 : 0.0 },
                   ]}
-                  source={ICON_RECORDING.module}
+                  source={Icons.RECORDING.module}
                 />
                 <Text
                   style={[
@@ -440,8 +416,8 @@ export default class App extends React.Component {
           <View style={styles.playbackContainer}>
             <Slider
               style={styles.playbackSlider}
-              trackImage={ICON_TRACK_1.module}
-              thumbImage={ICON_THUMB_1.module}
+              trackImage={Icons.TRACK_1.module}
+              thumbImage={Icons.THUMB_1.module}
               value={this._getSeekSliderPosition()}
               onValueChange={this._onSeekSliderValueChange}
               onSlidingComplete={this._onSeekSliderSlidingComplete}
@@ -470,15 +446,15 @@ export default class App extends React.Component {
                   style={styles.image}
                   source={
                     this.state.muted
-                      ? ICON_MUTED_BUTTON.module
-                      : ICON_UNMUTED_BUTTON.module
+                      ? Icons.MUTED_BUTTON.module
+                      : Icons.UNMUTED_BUTTON.module
                   }
                 />
               </TouchableHighlight>
               <Slider
                 style={styles.volumeSlider}
-                trackImage={ICON_TRACK_1.module}
-                thumbImage={ICON_THUMB_2.module}
+                trackImage={Icons.TRACK_1.module}
+                thumbImage={Icons.THUMB_2.module}
                 value={1}
                 onValueChange={this._onVolumeSliderValueChange}
                 disabled={!this.state.isPlaybackAllowed || this.state.isLoading}
@@ -495,8 +471,8 @@ export default class App extends React.Component {
                   style={styles.image}
                   source={
                     this.state.isPlaying
-                      ? ICON_PAUSE_BUTTON.module
-                      : ICON_PLAY_BUTTON.module
+                      ? Icons.PAUSE_BUTTON.module
+                      : Icons.PLAY_BUTTON.module
                   }
                 />
               </TouchableHighlight>
@@ -506,7 +482,7 @@ export default class App extends React.Component {
                 onPress={this._onStopPressed}
                 disabled={!this.state.isPlaybackAllowed || this.state.isLoading}
               >
-                <Image style={styles.image} source={ICON_STOP_BUTTON.module} />
+                <Image style={styles.image} source={Icons.STOP_BUTTON.module} />
               </TouchableHighlight>
             </View>
             <View />
@@ -517,15 +493,11 @@ export default class App extends React.Component {
               styles.buttonsContainerBottomRow,
             ]}
           >
-            <Text
-              style={[styles.timestamp, { fontFamily: "cutive-mono-regular" }]}
-            >
-              Rate:
-            </Text>
+            <Text style={styles.timestamp}>Rate:</Text>
             <Slider
               style={styles.rateSlider}
-              trackImage={ICON_TRACK_1.module}
-              thumbImage={ICON_THUMB_1.module}
+              trackImage={Icons.TRACK_1.module}
+              thumbImage={Icons.THUMB_1.module}
               value={this.state.rate / RATE_SCALE}
               onSlidingComplete={this._onRateSliderSlidingComplete}
               disabled={!this.state.isPlaybackAllowed || this.state.isLoading}
@@ -582,26 +554,26 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     alignSelf: "stretch",
-    minHeight: ICON_RECORD_BUTTON.height,
-    maxHeight: ICON_RECORD_BUTTON.height,
+    minHeight: Icons.RECORD_BUTTON.height,
+    maxHeight: Icons.RECORD_BUTTON.height,
   },
   recordingDataContainer: {
     flex: 1,
     flexDirection: "column",
     justifyContent: "space-between",
     alignItems: "center",
-    minHeight: ICON_RECORD_BUTTON.height,
-    maxHeight: ICON_RECORD_BUTTON.height,
-    minWidth: ICON_RECORD_BUTTON.width * 3.0,
-    maxWidth: ICON_RECORD_BUTTON.width * 3.0,
+    minHeight: Icons.RECORD_BUTTON.height,
+    maxHeight: Icons.RECORD_BUTTON.height,
+    minWidth: Icons.RECORD_BUTTON.width * 3.0,
+    maxWidth: Icons.RECORD_BUTTON.width * 3.0,
   },
   recordingDataRowContainer: {
     flex: 1,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    minHeight: ICON_RECORDING.height,
-    maxHeight: ICON_RECORDING.height,
+    minHeight: Icons.RECORDING.height,
+    maxHeight: Icons.RECORDING.height,
   },
   playbackContainer: {
     flex: 1,
@@ -609,8 +581,8 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     alignSelf: "stretch",
-    minHeight: ICON_THUMB_1.height * 2.0,
-    maxHeight: ICON_THUMB_1.height * 2.0,
+    minHeight: Icons.THUMB_1.height * 2.0,
+    maxHeight: Icons.THUMB_1.height * 2.0,
   },
   playbackSlider: {
     alignSelf: "stretch",
@@ -640,7 +612,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   buttonsContainerTopRow: {
-    maxHeight: ICON_MUTED_BUTTON.height,
+    maxHeight: Icons.MUTED_BUTTON.height,
     alignSelf: "stretch",
     paddingRight: 20,
   },
@@ -649,8 +621,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    minWidth: ((ICON_PLAY_BUTTON.width + ICON_STOP_BUTTON.width) * 3.0) / 2.0,
-    maxWidth: ((ICON_PLAY_BUTTON.width + ICON_STOP_BUTTON.width) * 3.0) / 2.0,
+    minWidth: ((Icons.PLAY_BUTTON.width + Icons.STOP_BUTTON.width) * 3.0) / 2.0,
+    maxWidth: ((Icons.PLAY_BUTTON.width + Icons.STOP_BUTTON.width) * 3.0) / 2.0,
   },
   volumeContainer: {
     flex: 1,
@@ -661,13 +633,16 @@ const styles = StyleSheet.create({
     maxWidth: DEVICE_WIDTH / 2.0,
   },
   volumeSlider: {
-    width: DEVICE_WIDTH / 2.0 - ICON_MUTED_BUTTON.width,
+    width: DEVICE_WIDTH / 2.0 - Icons.MUTED_BUTTON.width,
   },
   buttonsContainerBottomRow: {
-    maxHeight: ICON_THUMB_1.height,
+    maxHeight: Icons.THUMB_1.height,
     alignSelf: "stretch",
     paddingRight: 20,
     paddingLeft: 20,
+  },
+  timestamp: {
+    fontFamily: "cutive-mono-regular",
   },
   rateSlider: {
     width: DEVICE_WIDTH / 2.0,
