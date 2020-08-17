@@ -1,8 +1,4 @@
-/**
- * @flow
- */
-
-import React from 'react';
+import React from "react";
 import {
   Dimensions,
   Image,
@@ -11,12 +7,12 @@ import {
   Text,
   TouchableHighlight,
   View,
-} from 'react-native';
-import { Asset } from 'expo-asset';
-import { Audio } from 'expo-av';
-import * as FileSystem from 'expo-file-system';
-import * as Font from 'expo-font';
-import * as Permissions from 'expo-permissions';
+} from "react-native";
+import { Asset } from "expo-asset";
+import { Audio } from "expo-av";
+import * as FileSystem from "expo-file-system";
+import * as Font from "expo-font";
+import * as Permissions from "expo-permissions";
 
 class Icon {
   constructor(module, width, height) {
@@ -27,23 +23,51 @@ class Icon {
   }
 }
 
-const ICON_RECORD_BUTTON = new Icon(require('./assets/images/record_button.png'), 70, 119);
-const ICON_RECORDING = new Icon(require('./assets/images/record_icon.png'), 20, 14);
+const ICON_RECORD_BUTTON = new Icon(
+  require("./assets/images/record_button.png"),
+  70,
+  119
+);
+const ICON_RECORDING = new Icon(
+  require("./assets/images/record_icon.png"),
+  20,
+  14
+);
 
-const ICON_PLAY_BUTTON = new Icon(require('./assets/images/play_button.png'), 34, 51);
-const ICON_PAUSE_BUTTON = new Icon(require('./assets/images/pause_button.png'), 34, 51);
-const ICON_STOP_BUTTON = new Icon(require('./assets/images/stop_button.png'), 22, 22);
+const ICON_PLAY_BUTTON = new Icon(
+  require("./assets/images/play_button.png"),
+  34,
+  51
+);
+const ICON_PAUSE_BUTTON = new Icon(
+  require("./assets/images/pause_button.png"),
+  34,
+  51
+);
+const ICON_STOP_BUTTON = new Icon(
+  require("./assets/images/stop_button.png"),
+  22,
+  22
+);
 
-const ICON_MUTED_BUTTON = new Icon(require('./assets/images/muted_button.png'), 67, 58);
-const ICON_UNMUTED_BUTTON = new Icon(require('./assets/images/unmuted_button.png'), 67, 58);
+const ICON_MUTED_BUTTON = new Icon(
+  require("./assets/images/muted_button.png"),
+  67,
+  58
+);
+const ICON_UNMUTED_BUTTON = new Icon(
+  require("./assets/images/unmuted_button.png"),
+  67,
+  58
+);
 
-const ICON_TRACK_1 = new Icon(require('./assets/images/track_1.png'), 166, 5);
-const ICON_THUMB_1 = new Icon(require('./assets/images/thumb_1.png'), 18, 19);
-const ICON_THUMB_2 = new Icon(require('./assets/images/thumb_2.png'), 15, 19);
+const ICON_TRACK_1 = new Icon(require("./assets/images/track_1.png"), 166, 5);
+const ICON_THUMB_1 = new Icon(require("./assets/images/thumb_1.png"), 18, 19);
+const ICON_THUMB_2 = new Icon(require("./assets/images/thumb_2.png"), 15, 19);
 
-const { width: DEVICE_WIDTH, height: DEVICE_HEIGHT } = Dimensions.get('window');
-const BACKGROUND_COLOR = '#FFF8ED';
-const LIVE_COLOR = '#FF0000';
+const { width: DEVICE_WIDTH, height: DEVICE_HEIGHT } = Dimensions.get("window");
+const BACKGROUND_COLOR = "#FFF8ED";
+const LIVE_COLOR = "#FF0000";
 const DISABLED_OPACITY = 0.5;
 const RATE_SCALE = 3.0;
 
@@ -70,7 +94,9 @@ export default class App extends React.Component {
       volume: 1.0,
       rate: 1.0,
     };
-    this.recordingSettings = JSON.parse(JSON.stringify(Audio.RECORDING_OPTIONS_PRESET_LOW_QUALITY));
+    this.recordingSettings = JSON.parse(
+      JSON.stringify(Audio.RECORDING_OPTIONS_PRESET_LOW_QUALITY)
+    );
     // // UNCOMMENT THIS TO TEST maxFileSize:
     // this.recordingSettings.android['maxFileSize'] = 12000;
   }
@@ -78,21 +104,21 @@ export default class App extends React.Component {
   componentDidMount() {
     (async () => {
       await Font.loadAsync({
-        'cutive-mono-regular': require('./assets/fonts/CutiveMono-Regular.ttf'),
+        "cutive-mono-regular": require("./assets/fonts/CutiveMono-Regular.ttf"),
       });
       this.setState({ fontLoaded: true });
     })();
     this._askForPermissions();
   }
 
-  _askForPermissions = async () => {
+  private _askForPermissions = async () => {
     const response = await Permissions.askAsync(Permissions.AUDIO_RECORDING);
     this.setState({
-      haveRecordingPermissions: response.status === 'granted',
+      haveRecordingPermissions: response.status === "granted",
     });
   };
 
-  _updateScreenForSoundStatus = status => {
+  private _updateScreenForSoundStatus = (status) => {
     if (status.isLoaded) {
       this.setState({
         soundDuration: status.durationMillis,
@@ -117,7 +143,7 @@ export default class App extends React.Component {
     }
   };
 
-  _updateScreenForRecordingStatus = status => {
+  private _updateScreenForRecordingStatus = (status) => {
     if (status.canRecord) {
       this.setState({
         isRecording: status.isRecording,
@@ -134,7 +160,7 @@ export default class App extends React.Component {
     }
   };
 
-  async _stopPlaybackAndBeginRecording() {
+  private async _stopPlaybackAndBeginRecording() {
     this.setState({
       isLoading: true,
     });
@@ -168,7 +194,7 @@ export default class App extends React.Component {
     });
   }
 
-  async _stopRecordingAndEnablePlayback() {
+  private async _stopRecordingAndEnablePlayback() {
     this.setState({
       isLoading: true,
     });
@@ -205,7 +231,7 @@ export default class App extends React.Component {
     });
   }
 
-  _onRecordPressed = () => {
+  private _onRecordPressed = () => {
     if (this.state.isRecording) {
       this._stopRecordingAndEnablePlayback();
     } else {
@@ -213,7 +239,7 @@ export default class App extends React.Component {
     }
   };
 
-  _onPlayPausePressed = () => {
+  private _onPlayPausePressed = () => {
     if (this.sound != null) {
       if (this.state.isPlaying) {
         this.sound.pauseAsync();
@@ -223,25 +249,25 @@ export default class App extends React.Component {
     }
   };
 
-  _onStopPressed = () => {
+  private _onStopPressed = () => {
     if (this.sound != null) {
       this.sound.stopAsync();
     }
   };
 
-  _onMutePressed = () => {
+  private _onMutePressed = () => {
     if (this.sound != null) {
       this.sound.setIsMutedAsync(!this.state.muted);
     }
   };
 
-  _onVolumeSliderValueChange = value => {
+  private _onVolumeSliderValueChange = (value) => {
     if (this.sound != null) {
       this.sound.setVolumeAsync(value);
     }
   };
 
-  _trySetRate = async (rate, shouldCorrectPitch) => {
+  private _trySetRate = async (rate, shouldCorrectPitch) => {
     if (this.sound != null) {
       try {
         await this.sound.setRateAsync(rate, shouldCorrectPitch);
@@ -251,15 +277,15 @@ export default class App extends React.Component {
     }
   };
 
-  _onRateSliderSlidingComplete = async value => {
+  private _onRateSliderSlidingComplete = async (value) => {
     this._trySetRate(value * RATE_SCALE, this.state.shouldCorrectPitch);
   };
 
-  _onPitchCorrectionPressed = async value => {
+  private _onPitchCorrectionPressed = async (value) => {
     this._trySetRate(this.state.rate, !this.state.shouldCorrectPitch);
   };
 
-  _onSeekSliderValueChange = value => {
+  private _onSeekSliderValueChange = (value) => {
     if (this.sound != null && !this.isSeeking) {
       this.isSeeking = true;
       this.shouldPlayAtEndOfSeek = this.state.shouldPlay;
@@ -267,7 +293,7 @@ export default class App extends React.Component {
     }
   };
 
-  _onSeekSliderSlidingComplete = async value => {
+  private _onSeekSliderSlidingComplete = async (value) => {
     if (this.sound != null) {
       this.isSeeking = false;
       const seekPosition = value * this.state.soundDuration;
@@ -279,7 +305,7 @@ export default class App extends React.Component {
     }
   };
 
-  _getSeekSliderPosition() {
+  private _getSeekSliderPosition() {
     if (
       this.sound != null &&
       this.state.soundPosition != null &&
@@ -290,35 +316,35 @@ export default class App extends React.Component {
     return 0;
   }
 
-  _getMMSSFromMillis(millis) {
+  private _getMMSSFromMillis(millis) {
     const totalSeconds = millis / 1000;
     const seconds = Math.floor(totalSeconds % 60);
     const minutes = Math.floor(totalSeconds / 60);
 
-    const padWithZero = number => {
+    const padWithZero = (number) => {
       const string = number.toString();
       if (number < 10) {
-        return '0' + string;
+        return "0" + string;
       }
       return string;
     };
-    return padWithZero(minutes) + ':' + padWithZero(seconds);
+    return padWithZero(minutes) + ":" + padWithZero(seconds);
   }
 
-  _getPlaybackTimestamp() {
+  private _getPlaybackTimestamp() {
     if (
       this.sound != null &&
       this.state.soundPosition != null &&
       this.state.soundDuration != null
     ) {
-      return `${this._getMMSSFromMillis(this.state.soundPosition)} / ${this._getMMSSFromMillis(
-        this.state.soundDuration
-      )}`;
+      return `${this._getMMSSFromMillis(
+        this.state.soundPosition
+      )} / ${this._getMMSSFromMillis(this.state.soundDuration)}`;
     }
-    return '';
+    return "";
   }
 
-  _getRecordingTimestamp() {
+  private _getRecordingTimestamp() {
     if (this.state.recordingDuration != null) {
       return `${this._getMMSSFromMillis(this.state.recordingDuration)}`;
     }
@@ -326,22 +352,26 @@ export default class App extends React.Component {
   }
 
   render() {
-    if(!this.state.fontLoaded) {
-        return (
-            <View style={styles.emptyContainer} />
-        )
+    if (!this.state.fontLoaded) {
+      return <View style={styles.emptyContainer} />;
     }
 
-    if (!this.state.haveRecordingPermissions){
-        return (
-            <View style={styles.container}>
-                <View />
-                <Text style={[styles.noPermissionsText, { fontFamily: 'cutive-mono-regular' }]}>
-                  You must enable audio recording permissions in order to use this app.
-                </Text>
-                <View />
-            </View>
-        )
+    if (!this.state.haveRecordingPermissions) {
+      return (
+        <View style={styles.container}>
+          <View />
+          <Text
+            style={[
+              styles.noPermissionsText,
+              { fontFamily: "cutive-mono-regular" },
+            ]}
+          >
+            You must enable audio recording permissions in order to use this
+            app.
+          </Text>
+          <View />
+        </View>
+      );
     }
 
     return (
@@ -352,7 +382,8 @@ export default class App extends React.Component {
             {
               opacity: this.state.isLoading ? DISABLED_OPACITY : 1.0,
             },
-          ]}>
+          ]}
+        >
           <View />
           <View style={styles.recordingContainer}>
             <View />
@@ -360,20 +391,31 @@ export default class App extends React.Component {
               underlayColor={BACKGROUND_COLOR}
               style={styles.wrapper}
               onPress={this._onRecordPressed}
-              disabled={this.state.isLoading}>
+              disabled={this.state.isLoading}
+            >
               <Image style={styles.image} source={ICON_RECORD_BUTTON.module} />
             </TouchableHighlight>
             <View style={styles.recordingDataContainer}>
               <View />
-              <Text style={[styles.liveText, { fontFamily: 'cutive-mono-regular' }]}>
-                {this.state.isRecording ? 'LIVE' : ''}
+              <Text
+                style={[styles.liveText, { fontFamily: "cutive-mono-regular" }]}
+              >
+                {this.state.isRecording ? "LIVE" : ""}
               </Text>
               <View style={styles.recordingDataRowContainer}>
                 <Image
-                  style={[styles.image, { opacity: this.state.isRecording ? 1.0 : 0.0 }]}
+                  style={[
+                    styles.image,
+                    { opacity: this.state.isRecording ? 1.0 : 0.0 },
+                  ]}
                   source={ICON_RECORDING.module}
                 />
-                <Text style={[styles.recordingTimestamp, { fontFamily: 'cutive-mono-regular' }]}>
+                <Text
+                  style={[
+                    styles.recordingTimestamp,
+                    { fontFamily: "cutive-mono-regular" },
+                  ]}
+                >
                   {this._getRecordingTimestamp()}
                 </Text>
               </View>
@@ -388,9 +430,12 @@ export default class App extends React.Component {
             styles.halfScreenContainer,
             {
               opacity:
-                !this.state.isPlaybackAllowed || this.state.isLoading ? DISABLED_OPACITY : 1.0,
+                !this.state.isPlaybackAllowed || this.state.isLoading
+                  ? DISABLED_OPACITY
+                  : 1.0,
             },
-          ]}>
+          ]}
+        >
           <View />
           <View style={styles.playbackContainer}>
             <Slider
@@ -402,20 +447,32 @@ export default class App extends React.Component {
               onSlidingComplete={this._onSeekSliderSlidingComplete}
               disabled={!this.state.isPlaybackAllowed || this.state.isLoading}
             />
-            <Text style={[styles.playbackTimestamp, { fontFamily: 'cutive-mono-regular' }]}>
+            <Text
+              style={[
+                styles.playbackTimestamp,
+                { fontFamily: "cutive-mono-regular" },
+              ]}
+            >
               {this._getPlaybackTimestamp()}
             </Text>
           </View>
-          <View style={[styles.buttonsContainerBase, styles.buttonsContainerTopRow]}>
+          <View
+            style={[styles.buttonsContainerBase, styles.buttonsContainerTopRow]}
+          >
             <View style={styles.volumeContainer}>
               <TouchableHighlight
                 underlayColor={BACKGROUND_COLOR}
                 style={styles.wrapper}
                 onPress={this._onMutePressed}
-                disabled={!this.state.isPlaybackAllowed || this.state.isLoading}>
+                disabled={!this.state.isPlaybackAllowed || this.state.isLoading}
+              >
                 <Image
                   style={styles.image}
-                  source={this.state.muted ? ICON_MUTED_BUTTON.module : ICON_UNMUTED_BUTTON.module}
+                  source={
+                    this.state.muted
+                      ? ICON_MUTED_BUTTON.module
+                      : ICON_UNMUTED_BUTTON.module
+                  }
                 />
               </TouchableHighlight>
               <Slider
@@ -432,24 +489,39 @@ export default class App extends React.Component {
                 underlayColor={BACKGROUND_COLOR}
                 style={styles.wrapper}
                 onPress={this._onPlayPausePressed}
-                disabled={!this.state.isPlaybackAllowed || this.state.isLoading}>
+                disabled={!this.state.isPlaybackAllowed || this.state.isLoading}
+              >
                 <Image
                   style={styles.image}
-                  source={this.state.isPlaying ? ICON_PAUSE_BUTTON.module : ICON_PLAY_BUTTON.module}
+                  source={
+                    this.state.isPlaying
+                      ? ICON_PAUSE_BUTTON.module
+                      : ICON_PLAY_BUTTON.module
+                  }
                 />
               </TouchableHighlight>
               <TouchableHighlight
                 underlayColor={BACKGROUND_COLOR}
                 style={styles.wrapper}
                 onPress={this._onStopPressed}
-                disabled={!this.state.isPlaybackAllowed || this.state.isLoading}>
+                disabled={!this.state.isPlaybackAllowed || this.state.isLoading}
+              >
                 <Image style={styles.image} source={ICON_STOP_BUTTON.module} />
               </TouchableHighlight>
             </View>
             <View />
           </View>
-          <View style={[styles.buttonsContainerBase, styles.buttonsContainerBottomRow]}>
-            <Text style={[styles.timestamp, { fontFamily: 'cutive-mono-regular' }]}>Rate:</Text>
+          <View
+            style={[
+              styles.buttonsContainerBase,
+              styles.buttonsContainerBottomRow,
+            ]}
+          >
+            <Text
+              style={[styles.timestamp, { fontFamily: "cutive-mono-regular" }]}
+            >
+              Rate:
+            </Text>
             <Slider
               style={styles.rateSlider}
               trackImage={ICON_TRACK_1.module}
@@ -462,9 +534,10 @@ export default class App extends React.Component {
               underlayColor={BACKGROUND_COLOR}
               style={styles.wrapper}
               onPress={this._onPitchCorrectionPressed}
-              disabled={!this.state.isPlaybackAllowed || this.state.isLoading}>
-              <Text style={[{ fontFamily: 'cutive-mono-regular' }]}>
-                PC: {this.state.shouldCorrectPitch ? 'yes' : 'no'}
+              disabled={!this.state.isPlaybackAllowed || this.state.isLoading}
+            >
+              <Text style={[{ fontFamily: "cutive-mono-regular" }]}>
+                PC: {this.state.shouldCorrectPitch ? "yes" : "no"}
               </Text>
             </TouchableHighlight>
           </View>
@@ -477,46 +550,46 @@ export default class App extends React.Component {
 
 const styles = StyleSheet.create({
   emptyContainer: {
-    alignSelf: 'stretch',
+    alignSelf: "stretch",
     backgroundColor: BACKGROUND_COLOR,
   },
   container: {
     flex: 1,
-    flexDirection: 'column',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    alignSelf: 'stretch',
+    flexDirection: "column",
+    justifyContent: "space-between",
+    alignItems: "center",
+    alignSelf: "stretch",
     backgroundColor: BACKGROUND_COLOR,
     minHeight: DEVICE_HEIGHT,
     maxHeight: DEVICE_HEIGHT,
   },
   noPermissionsText: {
-    textAlign: 'center',
+    textAlign: "center",
   },
   wrapper: {},
   halfScreenContainer: {
     flex: 1,
-    flexDirection: 'column',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    alignSelf: 'stretch',
+    flexDirection: "column",
+    justifyContent: "space-between",
+    alignItems: "center",
+    alignSelf: "stretch",
     minHeight: DEVICE_HEIGHT / 2.0,
     maxHeight: DEVICE_HEIGHT / 2.0,
   },
   recordingContainer: {
     flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    alignSelf: 'stretch',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    alignSelf: "stretch",
     minHeight: ICON_RECORD_BUTTON.height,
     maxHeight: ICON_RECORD_BUTTON.height,
   },
   recordingDataContainer: {
     flex: 1,
-    flexDirection: 'column',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "column",
+    justifyContent: "space-between",
+    alignItems: "center",
     minHeight: ICON_RECORD_BUTTON.height,
     maxHeight: ICON_RECORD_BUTTON.height,
     minWidth: ICON_RECORD_BUTTON.width * 3.0,
@@ -524,23 +597,23 @@ const styles = StyleSheet.create({
   },
   recordingDataRowContainer: {
     flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     minHeight: ICON_RECORDING.height,
     maxHeight: ICON_RECORDING.height,
   },
   playbackContainer: {
     flex: 1,
-    flexDirection: 'column',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    alignSelf: 'stretch',
+    flexDirection: "column",
+    justifyContent: "space-between",
+    alignItems: "center",
+    alignSelf: "stretch",
     minHeight: ICON_THUMB_1.height * 2.0,
     maxHeight: ICON_THUMB_1.height * 2.0,
   },
   playbackSlider: {
-    alignSelf: 'stretch',
+    alignSelf: "stretch",
   },
   liveText: {
     color: LIVE_COLOR,
@@ -549,8 +622,8 @@ const styles = StyleSheet.create({
     paddingLeft: 20,
   },
   playbackTimestamp: {
-    textAlign: 'right',
-    alignSelf: 'stretch',
+    textAlign: "right",
+    alignSelf: "stretch",
     paddingRight: 20,
   },
   image: {
@@ -562,28 +635,28 @@ const styles = StyleSheet.create({
   },
   buttonsContainerBase: {
     flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   buttonsContainerTopRow: {
     maxHeight: ICON_MUTED_BUTTON.height,
-    alignSelf: 'stretch',
+    alignSelf: "stretch",
     paddingRight: 20,
   },
   playStopContainer: {
     flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    minWidth: (ICON_PLAY_BUTTON.width + ICON_STOP_BUTTON.width) * 3.0 / 2.0,
-    maxWidth: (ICON_PLAY_BUTTON.width + ICON_STOP_BUTTON.width) * 3.0 / 2.0,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    minWidth: ((ICON_PLAY_BUTTON.width + ICON_STOP_BUTTON.width) * 3.0) / 2.0,
+    maxWidth: ((ICON_PLAY_BUTTON.width + ICON_STOP_BUTTON.width) * 3.0) / 2.0,
   },
   volumeContainer: {
     flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     minWidth: DEVICE_WIDTH / 2.0,
     maxWidth: DEVICE_WIDTH / 2.0,
   },
@@ -592,7 +665,7 @@ const styles = StyleSheet.create({
   },
   buttonsContainerBottomRow: {
     maxHeight: ICON_THUMB_1.height,
-    alignSelf: 'stretch',
+    alignSelf: "stretch",
     paddingRight: 20,
     paddingLeft: 20,
   },

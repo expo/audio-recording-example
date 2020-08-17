@@ -1,8 +1,6 @@
 {
-  "name": "Record",
-  "version": "0.0.0",
+  "name": "audio-recording-example",
   "description": "Hear me now.",
-  "author": null,
   "private": true,
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
@@ -12,12 +10,18 @@
     "eject": "expo eject"
   },
   "dependencies": {
-    "expo": "^38.0.0",
+    "expo": "^38.0.8",
     "expo-asset": "~8.1.7",
     "expo-av": "~8.2.1",
     "expo-file-system": "~9.0.1",
     "expo-permissions": "~9.0.1",
     "react": "16.11.0",
     "react-native": "https://github.com/expo/react-native/archive/sdk-38.0.2.tar.gz"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.8.6",
+    "@types/react": "~16.9.41",
+    "@types/react-native": "~0.62.13",
+    "typescript": "~3.9.5"
   }
 }
