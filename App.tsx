@@ -183,7 +183,20 @@ export default class App extends React.Component<Props, State> {
     try {
       await this.recording.stopAndUnloadAsync();
     } catch (error) {
-      // Do nothing -- we are already unloaded.
+      // On Android, calling stop before any data has been collected results in
+      // an E_AUDIO_NODATA error. This means no audio data has been written to
+      // the output file is invalid.
+      if (error.code === "E_AUDIO_NODATA") {
+        console.log(
+          `Stop was called too quickly, no data has yet been received (${error.message})`
+        );
+      } else {
+        console.log("STOP ERROR: ", error.code, error.name, error.message);
+      }
+      this.setState({
+        isLoading: false,
+      });
+      return;
     }
     const info = await FileSystem.getInfoAsync(this.recording.getURI() || "");
     console.log(`FILE INFO: ${JSON.stringify(info)}`);
